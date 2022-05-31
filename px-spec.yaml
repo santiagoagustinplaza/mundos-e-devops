@@ -1,0 +1,59 @@
+# SOURCE: https://install.portworx.com/?operator=true&mc=false&kbver=1.23.5&oem=esse&user=984e92b1-d994-48f7-9086-14ee0156cb7f&b=true&kd=type%3DPremium_LRS%2Csize%3D150&s=%22type%3DStandard_LRS%2Csize%3D32%22&c=px-cluster-6aca39e6-1550-469e-aad9-a05688094b33&aks=true&stork=true&csi=true&mon=true&tel=false&st=k8s&e=AZURE_ENVIRONMENT%3DAzureUSGovernmentCloud&promop=true
+kind: StorageCluster
+apiVersion: core.libopenstorage.org/v1
+metadata:
+  name: px-cluster-6aca39e6-1550-469e-aad9-a05688094b33
+  namespace: kube-system
+  annotations:
+    portworx.io/install-source: "https://install.portworx.com/?operator=true&mc=false&kbver=1.23.5&oem=esse&user=984e92b1-d994-48f7-9086-14ee0156cb7f&b=true&kd=type%3DPremium_LRS%2Csize%3D150&s=%22type%3DStandard_LRS%2Csize%3D32%22&c=px-cluster-6aca39e6-1550-469e-aad9-a05688094b33&aks=true&stork=true&csi=true&mon=true&tel=false&st=k8s&e=AZURE_ENVIRONMENT%3DAzureUSGovernmentCloud&promop=true"
+    portworx.io/is-aks: "true"
+    portworx.io/misc-args: "--oem esse"
+spec:
+  image: portworx/oci-monitor:2.9.1.4
+  imagePullPolicy: Always
+  kvdb:
+    internal: true
+  cloudStorage:
+    deviceSpecs:
+    - type=Standard_LRS,size=32
+    kvdbDeviceSpec: type=Premium_LRS,size=150
+  secretsProvider: k8s
+  stork:
+    enabled: true
+    args:
+      webhook-controller: "false"
+  autopilot:
+    enabled: true
+  monitoring:
+    prometheus:
+      enabled: true
+      exportMetrics: true
+  featureGates:
+    CSI: "true"
+  env:
+  - name: AZURE_CLIENT_SECRET
+    valueFrom:
+      secretKeyRef:
+        name: px-azure
+        key: AZURE_CLIENT_SECRET
+  - name: AZURE_CLIENT_ID
+    valueFrom:
+      secretKeyRef:
+        name: px-azure
+        key: AZURE_CLIENT_ID
+  - name: AZURE_TENANT_ID
+    valueFrom:
+      secretKeyRef:
+        name: px-azure
+        key: AZURE_TENANT_ID
+  - name: "AZURE_ENVIRONMENT"
+    value: "AzureUSGovernmentCloud"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: px-essential
+  namespace: kube-system
+data:
+  px-essen-user-id: OTg0ZTkyYjEtZDk5NC00OGY3LTkwODYtMTRlZTAxNTZjYjdm
+  px-osb-endpoint: aHR0cHM6Ly9weGVzc2VudGlhbHMucG9ydHdvcnguY29tL29zYi9iaWxsaW5nL3YxL3JlZ2lzdGVy
